@@ -11,8 +11,11 @@
 ## Open questions
 
 - Does the pointer reach userspace while an HDMI input is foreground, and in which device and form (REL or ABS)?
-- Does LG draw its cursor over HDMI, and can it be hidden?
-- Does OK send a CEC Enter as well as a click when the pointer is visible?
+- LG draws its cursor over HDMI (confirmed): can it be hidden while the box's input is on screen? Candidates: a
+  surface-manager/cursor setting over luna, or a transparent CleanYourTV overlay that sets the cursor to none.
+- OK sends a CEC Enter as well as our click (confirmed), so the SHIELD gets both. Options: stop the TV forwarding OK over
+  CEC while the pointer is visible (SIMPLINK key forwarding), have the bridge skip the click when a CEC Enter will do the
+  same job, or accept it where Enter on the focused item is harmless.
 - Wire format: absolute 0..65535 coordinates (HID absolute pointer) vs relative deltas.
 
 ## Spike results
@@ -40,7 +43,8 @@ Takeaways:
 - No pairing with LG's processing is needed; LG's input handling kept working while the probe read (no grab).
 - Node 8 reads char devices on libuv pool threads: `UV_THREADPOOL_SIZE` must exceed the device count.
 
-Still open: whether LG draws its cursor over HDMI, and whether OK also goes out as a CEC Enter to the SHIELD.
+Answered by looking at the TV (2026-11-21): **LG draws its own cursor over the HDMI picture**, and **OK also goes out to the
+SHIELD as a CEC Enter**. Both need handling in increment 3 (see open questions).
 
 ### Increment 2a, 2026-11-21: TV sender works end to end (through an SSH tunnel)
 

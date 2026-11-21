@@ -2,7 +2,7 @@
 //
 // Runs ON THE TV as root (webOS 5's Node 8: plain JavaScript). It never grabs the input device, so LG's handling is unchanged.
 //
-//   node sender.js --to 192.168.1.182[:47800] [--input com.webos.app.hdmi1] [--always] [--screen 1920x1080] [--verbose]
+//   node sender.js --to <bridge-ip>[:47800] [--input com.webos.app.hdmi1] [--always] [--screen 1920x1080] [--verbose]
 //
 // --always sends regardless of what is on screen (for testing).
 
