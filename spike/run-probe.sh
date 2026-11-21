@@ -7,4 +7,4 @@ KEY=${TV_KEY:-$HOME/.ssh/lg_cx}
 SSH="ssh -i $KEY -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=8 root@$TV"
 DIR=$(cd "$(dirname "$0")" && pwd)
 $SSH 'cat > /tmp/evdev-probe.js' < "$DIR/evdev-probe.js"
-$SSH "echo fg: \$(luna-send -n 1 -w 4000 -f luna://com.webos.applicationManager/getForegroundAppInfo '{}' 2>&1 | grep -o '\"appId\": *\"[^\"]*\"'); node /tmp/evdev-probe.js ${1:-15}"
+$SSH "echo fg: \$(luna-send -n 1 -w 4000 -f luna://com.webos.applicationManager/getForegroundAppInfo '{}' 2>&1 | grep appId); UV_THREADPOOL_SIZE=64 node /tmp/evdev-probe.js ${1:-15}"

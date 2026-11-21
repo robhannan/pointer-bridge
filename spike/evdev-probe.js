@@ -69,17 +69,23 @@ for (const ev of Object.keys(names)) {
   });
 }
 
-console.log('struct size ' + SIZE + ', arch ' + process.arch + ', listening ' + SECS + ' s on ' + streams.length + ' devices');
+// Each blocking read of a device holds a libuv pool thread until an event arrives, so the pool must be bigger than the device
+// count (run-probe.sh sets UV_THREADPOOL_SIZE) or some devices are never read. Output is written synchronously and the process
+// kills itself at the end: process.exit() waits on those blocked threads.
+const say = s => fs.writeSync(1, s + '\n');
+const pool = Number(process.env.UV_THREADPOOL_SIZE) || 4;
+say('struct size ' + SIZE + ', arch ' + process.arch + ', listening ' + SECS + ' s on ' + streams.length + ' devices (pool ' + pool + ')');
+if (pool <= streams.length) say('WARNING: UV_THREADPOOL_SIZE ' + pool + ' <= devices ' + streams.length + ': some devices will not be read');
 setTimeout(() => {
   for (const ev of Object.keys(stats)) {
     const keys = Object.keys(stats[ev]);
     if (!keys.length) continue;
-    console.log('\n' + ev + '  "' + names[ev] + '"');
+    say('\n' + ev + '  "' + names[ev] + '"');
     for (const k of keys.sort()) {
       const s = stats[ev][k];
-      console.log('  ' + k + '  n=' + s.n + '  min=' + s.min + '  max=' + s.max + '  last=' + s.last + '  first@' + s.first + 'ms');
+      say('  ' + k + '  n=' + s.n + '  min=' + s.min + '  max=' + s.max + '  last=' + s.last + '  first@' + s.first + 'ms');
     }
   }
-  console.log('\nsilent devices: ' + Object.keys(stats).filter(e => !Object.keys(stats[e]).length).map(e => e + ' "' + names[e] + '"').join(', '));
-  process.exit(0);
+  say('\nsilent devices: ' + Object.keys(stats).filter(e => !Object.keys(stats[e]).length).map(e => e + ' "' + names[e] + '"').join(', '));
+  process.kill(process.pid, 'SIGKILL');
 }, SECS * 1000);

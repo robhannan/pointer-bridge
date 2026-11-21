@@ -17,4 +17,27 @@
 
 ## Spike results
 
-_Not run yet: the TV was in standby on 2026-11-21._
+### Spike 0, 2026-11-21: GO
+
+Run with HDMI 1 on screen (per the user; the probe's own foreground check came back empty, luna-send is flaky), 20 s of
+waving, OK, arrows and wheel. Everything arrives on one device, readable without grabbing it:
+
+`/dev/input/event3` "LGE M-RCU - Builtin [0]" (the Magic Remote)
+
+| Event | Seen | Meaning |
+|---|---|---|
+| `ABS_X` | 236, 0..1914 | pointer X in **screen pixels** (1920 wide), already computed by LG |
+| `ABS_Y` | 254, 0..819 | pointer Y in screen pixels (1080 high; not swept to the bottom) |
+| `REL_WHEEL` | 44, ±1 | scroll wheel notches |
+| `KEY 28` (`KEY_ENTER`) | 2 | OK |
+| `KEY 103/105/108` | | arrow keys (up/left/down) |
+| `KEY 1198/1199/1222` | 6 each | LG-specific codes around pointer use; to identify (pointer show/hide?) |
+| `KEY 412` | 2 | to identify (Back?) |
+
+Takeaways:
+- The pointer is **absolute** and in screen pixels, so the bridge should be a HID **absolute** pointer (scale to 0..32767):
+  the SHIELD's cursor lands where the remote points, with no drift or acceleration to tune.
+- No pairing with LG's processing is needed; LG's input handling kept working while the probe read (no grab).
+- Node 8 reads char devices on libuv pool threads: `UV_THREADPOOL_SIZE` must exceed the device count.
+
+Still open: whether LG draws its cursor over HDMI, and whether OK also goes out as a CEC Enter to the SHIELD.
