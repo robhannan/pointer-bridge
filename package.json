@@ -1,0 +1,13 @@
+{
+  "name": "pointer-bridge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "receiver": "node mac/receiver.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

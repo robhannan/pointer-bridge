@@ -20,6 +20,17 @@ See [docs/PLAN.md](docs/PLAN.md) for the plan, open questions and spike results.
 | Android box | NVIDIA SHIELD TV Pro (2019), Android 11, `192.168.1.40:5555` (adb over network), on HDMI 1 |
 | Bridge | Raspberry Pi Pico W (to buy) |
 
+## Running the TV sender
+
+```sh
+pnpm install
+tv/run-tunnel.sh 30                 # sender on the TV, packets back over SSH, live map on the Mac
+tv/run-tunnel.sh 15 --always --verbose -- --log   # send whatever is on screen; log keys and every packet
+tv/run-sender.sh 192.168.1.50       # send straight over UDP to a bridge (the Pico W); Ctrl-C stops it
+```
+
+The wire format is in [docs/PROTOCOL.md](docs/PROTOCOL.md).
+
 ## Spike 0: can the TV see the pointer on HDMI?
 
 Turn the TV on, switch to HDMI 1, then run this and wave the remote, press OK and roll the wheel:

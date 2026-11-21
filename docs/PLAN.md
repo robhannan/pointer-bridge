@@ -41,3 +41,14 @@ Takeaways:
 - Node 8 reads char devices on libuv pool threads: `UV_THREADPOOL_SIZE` must exceed the device count.
 
 Still open: whether LG draws its cursor over HDMI, and whether OK also goes out as a CEC Enter to the SHIELD.
+
+### Increment 2a, 2026-11-21: TV sender works end to end (through an SSH tunnel)
+
+`tv/sender.js` on the TV, `mac/receiver.ts` on the Mac. This Mac is managed and its firewall blocks incoming UDP to
+Node (and can't be changed from the command line), so the test ran through `tv/run-tunnel.sh`: the sender sends to a
+relay on the TV and the relay's output comes back over SSH. The Wi-Fi hop itself is untested until the Pico W.
+
+- 25 s of use: 1,804 `POS` (~78/s while moving), 53 `WHEEL`, `STATE` heartbeats; no loss once the relay was up.
+- The foreground check saw HDMI 1 and turned the pointer on by itself (~2 s after start, the first poll).
+- OK is `KEY_ENTER` (28) while the pointer shows: 3 of 3 presses arrived as button down/up pairs, held 0.1–0.26 s.
+- Node 8 starts slowly on the TV (> 0.5 s): the first packets of a run can beat the relay; harmless.
